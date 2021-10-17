@@ -1,16 +1,18 @@
 import { PassportSerializer } from '@nestjs/passport';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from '../common/schemas/user.schema';
-import { Schema, Model } from 'mongoose';
+import mongoose from 'mongoose';
 
 export class SessionSerializer extends PassportSerializer {
-  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {
+  constructor(
+    @InjectModel(User.name) private userModel: mongoose.Model<UserDocument>,
+  ) {
     super();
   }
 
   serializeUser(
     user: User,
-    done: (err: Error, user: { _id: Schema.Types.ObjectId }) => void,
+    done: (err: Error, user: { _id: mongoose.Types.ObjectId }) => void,
   ): any {
     const { _id } = user;
     // user 의 id 만 뽑아서 session 에 저장한다.
@@ -20,7 +22,7 @@ export class SessionSerializer extends PassportSerializer {
   // session 에 있는 id 를 뽑아서 유저를 복원하여 req.user 에 넣어준다.
   async deserializeUser(
     payload: any,
-    done: (err: Error, payload: { _id: Schema.Types.ObjectId }) => void,
+    done: (err: Error, payload: { _id: mongoose.Types.ObjectId }) => void,
   ): Promise<any> {
     try {
       const user = await this.userModel

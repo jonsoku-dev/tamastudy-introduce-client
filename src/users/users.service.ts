@@ -29,6 +29,23 @@ export class UsersService {
     return this.userModel.find(query).skip(offset).limit(limit).exec();
   }
 
+  async findOneWithPassword(email: string): Promise<User> {
+    const foundUser = await this.userModel
+      .findOne({
+        email,
+      })
+      .select('password')
+      .exec();
+
+    if (!foundUser) {
+      throw new NotFoundException(
+        `${email} 에 해당하는 유저가 존재하지 않습니다.`,
+      );
+    }
+
+    return foundUser;
+  }
+
   async findOne(email: string): Promise<UserResponseDto> {
     const foundUser = await this.userModel
       .findOne({
